@@ -1,143 +1,374 @@
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Modern Auth</title>
-    <style>
-        :root {
-            --cafeniu-inchis: #4e342e;
-            --cafeniu-mediu: #795548;
-            --bej-fundal: #efebe9;
-            --alb: #ffffff;
-            --accent-verde: #6d824d;
-        }
+@extends('layouts.app')
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bej-fundal);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+@section('title', 'Dashboard')
 
-        /* Navigație superioară */
-        nav {
-            width: 100%;
-            background: var(--cafeniu-inchis);
-            padding: 15px 0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .nav-logo { font-weight: bold; font-size: 1.2rem; }
-
-        /* Container Principal */
-        .dashboard-container {
-            width: 90%;
-            max-width: 800px;
-            margin-top: 50px;
-        }
-
-        .welcome-card {
-            background: var(--alb);
-            padding: 40px;
-            border-radius: 25px; /* Colțuri foarte rotunde */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .profile-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--bej-fundal);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px;
-            font-size: 30px;
-            color: var(--cafeniu-mediu);
-        }
-
-        h1 { color: var(--cafeniu-inchis); margin-bottom: 10px; }
-        p { color: var(--cafeniu-mediu); font-size: 1.1rem; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .stat-item {
-            background: var(--bej-fundal);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(121, 85, 72, 0.1);
-        }
-
-        .stat-item span { display: block; color: var(--cafeniu-mediu); font-size: 0.9rem; }
-        .stat-item strong { color: var(--cafeniu-inchis); font-size: 1.1rem; }
-
-        /* Buton Logout */
-        .btn-logout {
-            margin-top: 30px;
-            background-color: transparent;
-            color: #d32f2f;
-            border: 2px solid #d32f2f;
-            padding: 10px 25px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background-color: #d32f2f;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-
-    <nav>
-        <div class="nav-logo">Sistem Autentificare</div>
-        <div>Sesiune activă: <strong>{{ Auth::user()->name }}</strong></div>
-    </nav>
-
-    <div class="dashboard-container">
+@section('content')
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
         <div class="welcome-card">
-            <div class="profile-icon">👤</div>
-            <h1>Bine ai revenit!</h1>
-            <p>Ești conectat în siguranță la profilul tău.</p>
-
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span>Nume Utilizator</span>
-                    <strong>{{ Auth::user()->name }}</strong>
+            <div class="welcome-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
                 </div>
-                <div class="stat-item">
-                    <span>Email</span>
-                    <strong>{{ Auth::user()->email }}</strong>
-                </div>
-                <div class="stat-item">
-                    <span>Membru din</span>
-                    <strong>{{ Auth::user()->created_at->format('d.m.Y') }}</strong>
+                <div class="welcome-text">
+                    <h1>Bine ai revenit, {{ Auth::user()->name }}!</h1>
+                    <p>Ești conectat în siguranță la profilul tău</p>
+                    @if(Auth::user()->isAdmin())
+                        <span class="admin-badge">
+                            <i class="fas fa-crown"></i>
+                            Administrator
+                        </span>
+                    @endif
                 </div>
             </div>
-
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn-logout">Închide Sesiunea</button>
-            </form>
         </div>
     </div>
 
-</body>
-</html>
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Acțiuni Rapide</h2>
+        <div class="actions-grid">
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="action-card admin-card">
+                    <div class="action-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Panou Admin</h3>
+                        <p>Gestionați utilizatorii și platforma</p>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+            @endif
+
+            <a href="{{ route('news.index') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Știri</h3>
+                    <p>Gestionați știrile și articolele</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ route('news.create') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Adaugă Știre</h3>
+                    <p>Creați o știre nouă</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="stats-section">
+        <h2>Informații Profil</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ Auth::user()->name }}</h3>
+                    <p>Nume utilizator</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ Auth::user()->email }}</h3>
+                    <p>Adresă email</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ Auth::user()->created_at->format('d M Y') }}</h3>
+                    <p>Membru din</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ Auth::user()->created_at->diffForHumans() }}</h3>
+                    <p>Cont creat</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('styles')
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.welcome-section {
+    margin-bottom: 3rem;
+}
+
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+.welcome-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profile-avatar {
+    font-size: 4rem;
+    opacity: 0.9;
+}
+
+.welcome-text h1 {
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+
+.welcome-text p {
+    margin: 0;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.quick-actions {
+    margin-bottom: 3rem;
+}
+
+.quick-actions h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quick-actions h2 i {
+    color: #667eea;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.action-content h3 {
+    margin: 0 0 0.25rem 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.action-content p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.action-arrow {
+    margin-left: auto;
+    color: #cbd5e0;
+    transition: all 0.3s ease;
+}
+
+.action-card:hover .action-arrow {
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+.admin-card {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+    border: 1px solid #ffd700;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+}
+
+.admin-card:hover {
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.3);
+    border-color: #ffb347;
+}
+
+.admin-card .action-icon {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+}
+
+.admin-card .action-content h3 {
+    color: #2c3e50;
+}
+
+.admin-card:hover .action-arrow {
+    color: #ffd700;
+}
+
+.stats-section h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-section h2 i {
+    color: #667eea;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.stat-content h3 {
+    margin: 0 0 0.25rem 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.stat-content p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+    color: #2c3e50;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+.admin-badge i {
+    color: #2c3e50;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .welcome-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .welcome-text h1 {
+        font-size: 2rem;
+    }
+
+    .actions-grid, .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-card, .stat-card {
+        padding: 1rem;
+    }
+
+    .action-content h3 {
+        font-size: 1.1rem;
+    }
+}
+</style>
+@endpush
